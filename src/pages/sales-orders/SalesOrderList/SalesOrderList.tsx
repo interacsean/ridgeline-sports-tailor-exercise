@@ -1,7 +1,15 @@
 import { type FC } from "react";
 import { Link } from "react-router-dom";
-import { Heading } from "@/components/Heading";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useSalesOrderList, type UseSalesOrderListReturn } from "./useSalesOrderList";
 import type { SalesOrder } from "@/types";
@@ -19,7 +27,7 @@ export const View: FC<SalesOrderListViewProps> = ({ orders, isLoading, error }) 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Heading as="h1">Sales Orders</Heading>
+        <h1 className="text-2xl font-semibold tracking-tight">Sales Orders</h1>
         <Button disabled={true}>Create Sales Order</Button>
       </div>
 
@@ -30,86 +38,72 @@ export const View: FC<SalesOrderListViewProps> = ({ orders, isLoading, error }) 
       )}
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
           {error}
         </div>
       )}
 
       {!isLoading && !error && orders.length === 0 && (
-        <p className="text-sm text-gray-500 py-8 text-center">
+        <p className="text-sm text-muted-foreground py-8 text-center">
           No sales orders yet.
         </p>
       )}
 
       {!isLoading && !error && orders.length > 0 && (
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Order
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Customer
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Total
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
+        <div className="rounded-lg border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {orders.map((order: SalesOrder) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm">
+                <TableRow key={order.id}>
+                  <TableCell>
                     <Link
                       to={`/sales-orders/${order.id}`}
-                      className="font-medium text-blue-600 hover:text-blue-800"
+                      className="font-medium text-primary underline-offset-4 hover:underline"
                     >
                       {order.orderNumber}
                     </Link>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {order.customerName}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
+                  </TableCell>
+                  <TableCell>{order.customerName}</TableCell>
+                  <TableCell className="text-muted-foreground">
                     {new Date(order.orderDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
+                  </TableCell>
+                  <TableCell>
                     <StatusBadge status={order.status} />
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-right">
+                  </TableCell>
+                  <TableCell className="text-right">
                     {formatCurrency(order.totalAmount.value, order.totalAmount.currency)}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
   );
 };
 
-const statusColors: Record<SalesOrder["status"], string> = {
-  draft: "bg-gray-100 text-gray-700",
-  confirmed: "bg-blue-100 text-blue-700",
-  shipped: "bg-yellow-100 text-yellow-700",
-  delivered: "bg-green-100 text-green-700",
-  cancelled: "bg-red-100 text-red-700",
+const statusVariants: Record<SalesOrder["status"], "default" | "secondary" | "destructive" | "outline"> = {
+  draft: "secondary",
+  confirmed: "default",
+  shipped: "outline",
+  delivered: "secondary",
+  cancelled: "destructive",
 };
 
 const StatusBadge: FC<{ status: SalesOrder["status"] }> = ({ status }) => (
-  <span
-    className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[status]}`}
-  >
+  <Badge variant={statusVariants[status]} className="capitalize">
     {status}
-  </span>
+  </Badge>
 );
 
 const SalesOrderList = () => {

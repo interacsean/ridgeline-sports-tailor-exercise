@@ -1,6 +1,20 @@
 import { type FC } from "react";
 import { Link } from "react-router-dom";
-import { Heading } from "@/components/Heading";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useSalesOrderDetail, type UseSalesOrderDetailReturn } from "./useSalesOrderDetail";
 import type { SalesOrder } from "@/types";
@@ -26,10 +40,10 @@ export const View: FC<SalesOrderDetailViewProps> = ({ order, isLoading, error })
   if (error || !order) {
     return (
       <div className="space-y-4">
-        <Link to="/sales-orders" className="text-sm text-blue-600 hover:text-blue-800">
+        <Link to="/sales-orders" className="text-sm text-primary hover:underline">
           &larr; Back to Sales Orders
         </Link>
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
           {error ?? "Order not found"}
         </div>
       </div>
@@ -39,101 +53,101 @@ export const View: FC<SalesOrderDetailViewProps> = ({ order, isLoading, error })
   return (
     <div className="space-y-6">
       <div>
-        <Link to="/sales-orders" className="text-sm text-blue-600 hover:text-blue-800">
+        <Link to="/sales-orders" className="text-sm text-primary hover:underline">
           &larr; Back to Sales Orders
         </Link>
       </div>
 
       <div className="flex items-center justify-between">
-        <Heading as="h1">{order.orderNumber}</Heading>
+        <h1 className="text-2xl font-semibold tracking-tight">{order.orderNumber}</h1>
         <StatusBadge status={order.status} />
       </div>
 
-      {/* Order Details Card */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <Heading as="h3" className="mb-4">
-          Order Details
-        </Heading>
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-          <div>
-            <dt className="text-gray-500">Customer</dt>
-            <dd className="font-medium text-gray-900">{order.customerName}</dd>
-          </div>
-          <div>
-            <dt className="text-gray-500">Order Date</dt>
-            <dd className="font-medium text-gray-900">
-              {new Date(order.orderDate).toLocaleDateString()}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-gray-500">Total</dt>
-            <dd className="font-medium text-gray-900">
-              {formatCurrency(order.totalAmount.value, order.totalAmount.currency)}
-            </dd>
-          </div>
-          {order.notes && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Order Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
             <div>
-              <dt className="text-gray-500">Notes</dt>
-              <dd className="text-gray-900">{order.notes}</dd>
+              <dt className="text-muted-foreground">Customer</dt>
+              <dd className="font-medium">{order.customerName}</dd>
             </div>
-          )}
-        </dl>
-      </div>
+            <div>
+              <dt className="text-muted-foreground">Order Date</dt>
+              <dd className="font-medium">
+                {new Date(order.orderDate).toLocaleDateString()}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Total</dt>
+              <dd className="font-medium">
+                {formatCurrency(order.totalAmount.value, order.totalAmount.currency)}
+              </dd>
+            </div>
+            {order.notes && (
+              <div>
+                <dt className="text-muted-foreground">Notes</dt>
+                <dd>{order.notes}</dd>
+              </div>
+            )}
+          </dl>
+        </CardContent>
+      </Card>
 
-      {/* Line Items Card */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <Heading as="h3" className="mb-4">
-          Line Items
-        </Heading>
-        {order.lineItems.length === 0 ? (
-          <p className="text-sm text-gray-500">No line items.</p>
-        ) : (
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead>
-              <tr>
-                <th className="pb-2 text-left font-medium text-gray-500">Product</th>
-                <th className="pb-2 text-left font-medium text-gray-500">SKU</th>
-                <th className="pb-2 text-right font-medium text-gray-500">Qty</th>
-                <th className="pb-2 text-right font-medium text-gray-500">Unit Price</th>
-                <th className="pb-2 text-right font-medium text-gray-500">Total</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {order.lineItems.map((item) => (
-                <tr key={item.id}>
-                  <td className="py-2 text-gray-900">{item.productName}</td>
-                  <td className="py-2 text-gray-500">{item.sku}</td>
-                  <td className="py-2 text-right text-gray-900">{item.quantity}</td>
-                  <td className="py-2 text-right text-gray-900">
-                    {formatCurrency(item.price.value, item.price.currency)}
-                  </td>
-                  <td className="py-2 text-right font-medium text-gray-900">
-                    {formatCurrency(item.lineTotal.value, item.lineTotal.currency)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Line Items</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {order.lineItems.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No line items.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product</TableHead>
+                  <TableHead>SKU</TableHead>
+                  <TableHead className="text-right">Qty</TableHead>
+                  <TableHead className="text-right">Unit Price</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {order.lineItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.productName}</TableCell>
+                    <TableCell className="text-muted-foreground">{item.sku}</TableCell>
+                    <TableCell className="text-right">{item.quantity}</TableCell>
+                    <TableCell className="text-right">
+                      {formatCurrency(item.price.value, item.price.currency)}
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatCurrency(item.lineTotal.value, item.lineTotal.currency)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-const statusColors: Record<SalesOrder["status"], string> = {
-  draft: "bg-gray-100 text-gray-700",
-  confirmed: "bg-blue-100 text-blue-700",
-  shipped: "bg-yellow-100 text-yellow-700",
-  delivered: "bg-green-100 text-green-700",
-  cancelled: "bg-red-100 text-red-700",
+const statusVariants: Record<SalesOrder["status"], "default" | "secondary" | "destructive" | "outline"> = {
+  draft: "secondary",
+  confirmed: "default",
+  shipped: "outline",
+  delivered: "secondary",
+  cancelled: "destructive",
 };
 
 const StatusBadge: FC<{ status: SalesOrder["status"] }> = ({ status }) => (
-  <span
-    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${statusColors[status]}`}
-  >
+  <Badge variant={statusVariants[status]} className="capitalize">
     {status}
-  </span>
+  </Badge>
 );
 
 const SalesOrderDetail = () => {

@@ -30,4 +30,4 @@ The API endpoint is accessible on https://sales-order-mock-api.ridgeline-sports-
 
 ## Design
 
-[Link to Figma file]
+[Link to Figma file](https://www.figma.com/design/98UATet007aUgqCPArOYK5/Sales-Order-Take-home?node-id=0-1&t=keA41KSbBROveFHr-1)

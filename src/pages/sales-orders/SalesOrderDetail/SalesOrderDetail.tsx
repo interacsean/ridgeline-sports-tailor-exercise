@@ -71,14 +71,22 @@ export const View: FC<SalesOrderDetailViewProps> = ({ order, isLoading, error })
           <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
             <div>
               <dt className="text-muted-foreground">Customer</dt>
-              <dd className="font-medium">{order.customerName}</dd>
+              <dd className="font-medium">{order.customer.name}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Order Date</dt>
+              <dt className="text-muted-foreground">Delivery Due Date</dt>
               <dd className="font-medium">
-                {new Date(order.orderDate).toLocaleDateString()}
+                {new Date(order.deliveryDueDate).toLocaleDateString()}
               </dd>
             </div>
+            {order.orderDate && (
+              <div>
+                <dt className="text-muted-foreground">Order Date</dt>
+                <dd className="font-medium">
+                  {new Date(order.orderDate).toLocaleDateString()}
+                </dd>
+              </div>
+            )}
             <div>
               <dt className="text-muted-foreground">Total</dt>
               <dd className="font-medium">

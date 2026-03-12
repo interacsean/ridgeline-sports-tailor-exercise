@@ -56,7 +56,7 @@ export const View: FC<SalesOrderListViewProps> = ({ orders, isLoading, error }) 
               <TableRow>
                 <TableHead>Order</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Delivery Due Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Total</TableHead>
               </TableRow>
@@ -72,9 +72,9 @@ export const View: FC<SalesOrderListViewProps> = ({ orders, isLoading, error }) 
                       {order.orderNumber}
                     </Link>
                   </TableCell>
-                  <TableCell>{order.customerName}</TableCell>
+                  <TableCell>{order.customer?.name ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {new Date(order.orderDate).toLocaleDateString()}
+                    {new Date(order.deliveryDueDate).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={order.status} />

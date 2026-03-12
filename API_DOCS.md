@@ -26,18 +26,29 @@ Returns a single sales order by ID.
 
 #### SalesOrder
 
-| Field         | Type         | Description                                      |
-| ------------- | ------------ | ------------------------------------------------ |
-| id            | string       | Unique identifier                                |
-| orderNumber   | string       | Human-readable order number (e.g. `SO-001`)      |
-| customerName  | string       | Customer name                                    |
-| orderDate     | string       | ISO 8601 date                                    |
-| status        | string       | One of `draft`, `confirmed`, `shipped`, `delivered`, `cancelled` |
-| notes         | string       | Optional notes                                   |
-| lineItems     | LineItem[]   | Ordered products                                 |
-| totalAmount   | Price        | Sum of all line totals                           |
-| createdAt     | string       | ISO 8601 timestamp                               |
-| updatedAt     | string       | ISO 8601 timestamp                               |
+| Field           | Type         | Description                                      |
+| --------------- | ------------ | ------------------------------------------------ |
+| id              | string       | Unique identifier                                |
+| orderNumber     | string       | Human-readable order number (e.g. `SO-001`)      |
+| customerId      | string       | Reference to the customer                        |
+| customer        | Customer     | Joined customer record                           |
+| orderDate       | string       | ISO 8601 date                                    |
+| deliveryDueDate | string       | ISO 8601 date                                    |
+| status          | string       | One of `draft`, `confirmed`, `shipped`, `delivered`, `cancelled` |
+| notes           | string       | Optional notes                                   |
+| lineItems       | LineItem[]   | Ordered products                                 |
+| totalAmount     | Price        | Sum of all line totals                           |
+| createdAt       | string       | ISO 8601 timestamp                               |
+| updatedAt       | string       | ISO 8601 timestamp                               |
+
+#### Customer
+
+| Field           | Type   | Description                    |
+| --------------- | ------ | ------------------------------ |
+| id              | string | Unique identifier (UUID)       |
+| name            | string | Customer display name          |
+| shippingAddress | string | Optional shipping address      |
+| billingAddress  | string | Optional billing address       |
 
 #### LineItem
 
@@ -77,15 +88,20 @@ Returns a single sales order by ID.
 
 Creates a new sales order. Returns the created order with a generated `id`.
 
+> ⚠️ Note: The API is a stateless, mock API only. Successfully "created" SalesOrders will no be persisted serverside, but will be returned in a Response Cookie (`mock_orders`) that serves as a session database.
+
+> Requests to fetch these new SalesOrders from GET:/sales-orders or GET:/sales-orders/:id will respect the SalesOrders contained in the `mock_orders` Request Cookie
+
 ### Request Body
 
-| Field        | Type       | Required | Description                                                        |
-| ------------ | ---------- | -------- | ------------------------------------------------------------------ |
-| customerName | string     | Yes      | Customer name                                                      |
-| orderDate    | string     | Yes      | ISO 8601 date                                                      |
-| status       | string     | No       | One of `draft`, `confirmed`, `shipped`, `delivered`, `cancelled`. Defaults to `draft` |
-| notes        | string     | No       | Optional notes                                                     |
-| lineItems    | LineItem[] | Yes      | At least one line item required                                    |
+| Field           | Type       | Required | Description                                                        |
+| --------------- | ---------- | -------- | ------------------------------------------------------------------ |
+| customerId      | string     | Yes      | Customer ID from the customers endpoint                            |
+| deliveryDueDate | string     | Yes      | ISO 8601 date — validation error if missing                        |
+| orderDate       | string     | No       | ISO 8601 date                                                      |
+| status          | string     | No       | One of `draft`, `confirmed`, `shipped`, `delivered`, `cancelled`. Defaults to `draft` |
+| notes           | string     | No       | Optional notes                                                     |
+| lineItems       | LineItem[] | Yes      | At least one line item required                                    |
 
 **LineItem**
 
@@ -94,7 +110,7 @@ Creates a new sales order. Returns the created order with a generated `id`.
 | productId   | string | Yes      | Product ID from the products endpoint     |
 | productName | string | Yes      | Product display name                      |
 | quantity    | number | Yes      | Must be greater than 0                    |
-| price       | number | Yes      | Unit price in cents (integer, no decimals) |
+| price       | number | Yes      | Unit price where value is in cents        |
 
 ### Response (201)
 
@@ -107,7 +123,7 @@ Returns the created [SalesOrder](#salesorder) object.
   "error": {
     "code": "VALIDATION_ERROR",
     "message": "Human-readable description of what went wrong",
-    "fields": ["fieldPath.that.failed"]
+    "fields": ["fieldPath.that.failed", "arrayFieldPath[0].that.failed"]
   }
 }
 ```
@@ -131,3 +147,15 @@ Returns all available products.
 | sku          | string | Stock keeping unit             |
 | category     | string | Product category               |
 | defaultPrice | Price  | Default unit price             |
+
+---
+
+## List Customers
+
+`GET /customers`
+
+Returns all available customers.
+
+### Response (200)
+
+Returns an array of [Customer](#customer) objects.

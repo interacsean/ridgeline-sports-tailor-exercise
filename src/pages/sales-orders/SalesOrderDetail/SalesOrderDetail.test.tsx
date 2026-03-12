@@ -7,8 +7,10 @@ import type { SalesOrder } from "@/types";
 const mockOrder: SalesOrder = {
   id: "so_001",
   orderNumber: "SO-001",
-  customerName: "Ridgeline Sports",
+  customerId: "cust_001",
+  customer: { id: "cust_001", name: "Ridgeline Sports" },
   orderDate: "2025-01-10T00:00:00Z",
+  deliveryDueDate: "2025-01-10T00:00:00Z",
   status: "confirmed",
   notes: "Rush delivery requested",
   lineItems: [

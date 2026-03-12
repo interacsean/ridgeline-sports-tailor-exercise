@@ -1,8 +1,17 @@
+export interface Customer {
+  id: string;
+  name: string;
+  shippingAddress?: string;
+  billingAddress?: string;
+}
+
 export interface SalesOrder {
   id: string;
   orderNumber: string;
-  customerName: string;
-  orderDate: string;
+  customerId: string;
+  customer: Customer;
+  orderDate?: string;
+  deliveryDueDate: string;
   status: "draft" | "confirmed" | "shipped" | "delivered" | "cancelled";
   notes?: string;
   lineItems: LineItem[];
